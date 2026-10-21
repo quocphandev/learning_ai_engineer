@@ -1,0 +1,2 @@
+# model có làm hệ thống đi vào một đường chưa ai viết được không? Vì sao đây là Workflow?
+- Mode không làm cho hệ thông đi vào một đường khác, vì Workflow đã quy định chỉ nằm trong ["hoàn tiền", "lỗi kỹ thuật", "khác"] thì mới rơi vào từng trường hợp xử  lý cụ thể, ngược lại thì sẽ chuyển cho nhân viên tư vấn.
