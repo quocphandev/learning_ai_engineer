@@ -11,7 +11,10 @@ Cách chay:
 import json
 import re
 import sys
+from pathlib import Path
 from dataclasses import dataclass, field
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+import common.llm as llm_module
 
 # 1. CONTRACT CỦA TOOL: tool tên gì, cần tham số nào, kiểu gì, định dạng ra sao
 TOOL_SCHEMAS = {
@@ -38,7 +41,7 @@ ORDER_DB = {
     # ORD-020 cố ý KHÔNG có trong DB (dữ liệu cũ) để mô phỏng order_not_found
 }
 
-CUSTOMER_ORDER = {
+CUSTOMER_ORDERS = {
     "C-1": ["ORD-010", "ORD-020"],
     "C-2": ["ORD-001"],
 }
@@ -80,15 +83,15 @@ class Trace:
         self.stages[stage] = (status, detail)
     
     def add_layer(self, layer, status, detail):
-        selt.gate_layers.append((layer, status, detail))
+        self.gate_layers.append((layer, status, detail))
         
 
 # 4. CÁC LỚP CỦA GATE: mỗi lớp trả lời MỘT câu hỏi riêng
 
-def parse_tool_request(row_output):
+def parse_tool_request(raw_output):
     """Lớp parse: output của model có đọc được thành một tool call không?"""
     try:
-        data = json.loads(row_output)
+        data = json.loads(raw_output)
     except json.JSONDecodeError as error:
         return None, f"Không đọc được JSON ({error.msg})"
 
@@ -262,8 +265,7 @@ Chỉ trả về MỘT đối tượng JSON: {"type": "tool_call", "name": "..."
  
  
 def gemini_propose_tool_request(customer_message):
-    from llm import chat  # llm.py bạn đã làm ở bài 03
-    return chat(SYSTEM_PROMPT, f"Tin nhắn của khách: {customer_message}", json_mode=True)
+    return llm_module.call_llm(f"Tin nhắn của khách: {customer_message}", SYSTEM_PROMPT, json_mode=True)
 
 # ---------------------------------------------------------------------------
 # 8. MAIN
